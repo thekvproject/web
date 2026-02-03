@@ -1,0 +1,190 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	:root {
+		color-scheme: dark;
+		--bg: #0a0a0a;
+		--bg-alt: #f6f6f2;
+		--surface: #111111;
+		--surface-alt: #ffffff;
+		--text: #f5f5f5;
+		--text-dark: #111111;
+		--muted: #c3c3c3;
+		--border: rgba(255, 255, 255, 0.12);
+		--accent: #ffffff;
+		--accent-contrast: #0a0a0a;
+		--shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+		--radius-lg: 28px;
+		--radius-md: 18px;
+		--radius-sm: 12px;
+	}
+
+	* {
+		box-sizing: border-box;
+	}
+
+	body {
+		@apply font-sans text-[color:var(--text)] bg-[color:var(--bg)];
+		margin: 0;
+		min-height: 100vh;
+		text-rendering: optimizeLegibility;
+		background-image: radial-gradient(1200px circle at 12% -20%, rgba(255, 255, 255, 0.08), transparent 60%),
+			radial-gradient(900px circle at 90% 10%, rgba(255, 255, 255, 0.06), transparent 60%);
+	}
+
+	a {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	img {
+		max-width: 100%;
+		display: block;
+	}
+
+	button {
+		font: inherit;
+		color: inherit;
+		background: none;
+		border: none;
+		cursor: pointer;
+	}
+
+	input,
+	select,
+	textarea {
+		font: inherit;
+		color: inherit;
+	}
+
+	input[type='checkbox'] {
+		accent-color: #ffffff;
+	}
+
+	:focus-visible {
+		outline: 3px solid #ffffff;
+		outline-offset: 3px;
+		border-radius: 6px;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		* {
+			animation-duration: 0.01ms !important;
+			animation-iteration-count: 1 !important;
+			transition-duration: 0.01ms !important;
+			scroll-behavior: auto !important;
+		}
+	}
+}
+
+@layer components {
+	.skip {
+		@apply absolute left-[-999px] top-3 bg-white text-black px-4 py-2 rounded-full z-20;
+	}
+
+	.skip:focus {
+		@apply left-3;
+	}
+
+	.app-shell {
+		@apply min-h-screen;
+	}
+
+	.display {
+		@apply font-display tracking-[-0.02em];
+	}
+
+	.surface {
+		@apply border border-white/10 bg-[color:var(--surface)] shadow-[var(--shadow)];
+	}
+
+	.surface-alt {
+		@apply border border-black/10 bg-[color:var(--surface-alt)] text-[color:var(--text-dark)];
+	}
+
+	.glass {
+		@apply border border-white/10 bg-white/10 shadow-[0_12px_30px_rgba(0,0,0,0.4)];
+		backdrop-filter: blur(14px);
+	}
+
+	.pill {
+		@apply inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-1 text-xs uppercase tracking-[0.18em];
+	}
+
+	.btn-primary {
+		@apply inline-flex items-center justify-center rounded-full bg-white text-black px-6 py-3 font-semibold tracking-[0.02em] shadow-[0_8px_24px_rgba(255,255,255,0.15)] transition-transform duration-200 hover:-translate-y-0.5;
+	}
+
+	.btn-ghost {
+		@apply inline-flex items-center justify-center rounded-full border border-white/20 px-5 py-2.5 text-sm bg-white/5;
+	}
+}
+
+@layer utilities {
+	.muted {
+		@apply text-[color:var(--muted)];
+	}
+
+	.fade-up {
+		opacity: 0;
+		transform: translateY(18px);
+		animation: fadeUp 700ms ease forwards;
+	}
+
+	.fade-in {
+		opacity: 0;
+		animation: fadeIn 600ms ease forwards;
+	}
+
+	.stagger > * {
+		opacity: 0;
+		transform: translateY(16px);
+		animation: fadeUp 700ms ease forwards;
+	}
+
+	.stagger > *:nth-child(2) {
+		animation-delay: 80ms;
+	}
+
+	.stagger > *:nth-child(3) {
+		animation-delay: 160ms;
+	}
+
+	.stagger > *:nth-child(4) {
+		animation-delay: 240ms;
+	}
+
+	.hover-lift {
+		transition: transform 180ms ease, box-shadow 180ms ease;
+	}
+
+	.hover-lift:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+	}
+}
+
+@keyframes fadeUp {
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes fadeIn {
+	to {
+		opacity: 1;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.fade-up,
+	.fade-in,
+	.stagger > * {
+		animation: none !important;
+		opacity: 1 !important;
+		transform: none !important;
+	}
+}
