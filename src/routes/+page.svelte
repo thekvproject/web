@@ -79,7 +79,7 @@
 					<li>auto-ban on signatures</li>
 					<li>whitelist</li>
 				</ul>
-				<button class="btn-ghost w-fit" type="button">Invite KV to your server</button>
+				<a class="btn-ghost w-fit" type="button" href={PUBLIC_DISCORD_BOT_INVITE_URL}>Invite KV to your server</a>
 			</div>
 			<div class="surface rounded-[var(--radius-md)] p-6 flex flex-col gap-4 border border-white/30 shadow-[0_0_0_1px_rgba(255,255,255,0.15)] hover-lift">
 				<div class="flex items-center justify-between">
