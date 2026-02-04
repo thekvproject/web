@@ -77,7 +77,10 @@ export const GET: RequestHandler = async ({ request, fetch, params }) => {
 		.eq('guild_id', guildId)
 		.single();
 
-	if (ownerRow?.owner_id && ownerRow.owner_id !== discordUserId) {
+	const ownerId = ownerRow?.owner_id as string | undefined;
+	const sessionOwnerId = getOwnerId(user);
+
+	if (ownerId && ownerId !== discordUserId && ownerId !== sessionOwnerId) {
 		return json({ error: 'forbidden' }, { status: 403 });
 	}
 
