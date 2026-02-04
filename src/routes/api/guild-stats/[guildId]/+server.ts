@@ -30,22 +30,7 @@ const ensureAdmin = async (fetchFn: typeof fetch, discordToken: string, guildId:
 	});
 };
 
-const rangeToMs = (range: string) => {
-	switch (range) {
-		case '1h':
-			return 60 * 60 * 1000;
-		case '24h':
-			return 24 * 60 * 60 * 1000;
-		case '7d':
-			return 7 * 24 * 60 * 60 * 1000;
-		case '30d':
-			return 30 * 24 * 60 * 60 * 1000;
-		default:
-			return 60 * 60 * 1000;
-	}
-};
-
-export const GET: RequestHandler = async ({ request, fetch, params, url }) => {
+export const GET: RequestHandler = async ({ request, fetch, params }) => {
 	const accessToken = getToken(request);
 	if (!accessToken) return json({ error: 'unauthorized' }, { status: 401 });
 
@@ -61,47 +46,21 @@ export const GET: RequestHandler = async ({ request, fetch, params, url }) => {
 	const isAdmin = await ensureAdmin(fetch, discordToken, guildId);
 	if (!isAdmin) return json({ error: 'forbidden' }, { status: 403 });
 
-	const range = url.searchParams.get('range') ?? '1h';
-	const since = new Date(Date.now() - rangeToMs(range)).toISOString();
-
-	const { count: banCount, error: banError } = await supabaseAdmin
+	const { data, error } = await supabaseAdmin
 		.from('exploiter_events')
-		.select('guild_id', { count: 'exact', head: true })
+		.select('exploiters, safe')
 		.eq('guild_id', guildId)
-		.eq('action', 'ban')
-		.gte('created_at', since);
+		.single();
 
-	if (banError) {
+	if (error && error.code !== 'PGRST116') {
 		return json({ error: 'stats_failed' }, { status: 500 });
 	}
 
-	const { count: safeCount, error: safeError } = await supabaseAdmin
-		.from('exploiter_events')
-		.select('guild_id', { count: 'exact', head: true })
-		.eq('guild_id', guildId)
-		.eq('action', 'safe')
-		.gte('created_at', since);
-
-	if (safeError) {
-		return json({ error: 'stats_failed' }, { status: 500 });
-	}
-
-	const { count: totalCount, error: totalError } = await supabaseAdmin
-		.from('exploiter_events')
-		.select('guild_id', { count: 'exact', head: true })
-		.eq('guild_id', guildId)
-		.gte('created_at', since);
-
-	if (totalError) {
-		return json({ error: 'stats_failed' }, { status: 500 });
-	}
+	const exploiters = data?.exploiters ?? 0;
+	const safe = data?.safe ?? 0;
+	const total = exploiters + safe;
 
 	return json({
-		range,
-		counts: {
-			ban: banCount ?? 0,
-			safe: safeCount ?? 0,
-			total: totalCount ?? 0
-		}
+		counts: { exploiters, safe, total }
 	});
 };

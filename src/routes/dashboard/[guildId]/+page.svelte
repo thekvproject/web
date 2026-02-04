@@ -6,7 +6,6 @@
 
 	let session: Awaited<ReturnType<typeof supabase.auth.getSession>>['data']['session'] = null;
 	let activeTab: 'stats' | 'whitelist' = 'stats';
-	let range: '1h' | '24h' | '7d' | '30d' = '1h';
 	let config: {
 		approved: boolean;
 		server_invite: string | null;
@@ -16,7 +15,7 @@
 	let errorMessage = '';
 	let newWhitelistEntry = '';
 	let updating = false;
-	let stats = { ban: 0, safe: 0, total: 0 };
+	let stats = { exploiters: 0, safe: 0, total: 0 };
 	let statsLoading = false;
 	let statsError = '';
 
@@ -77,7 +76,7 @@
 		statsLoading = true;
 		statsError = '';
 		try {
-			const response = await fetch(`/api/guild-stats/${guildId}?range=${range}`, {
+			const response = await fetch(`/api/guild-stats/${guildId}`, {
 				headers: {
 					Authorization: `Bearer ${session.access_token}`,
 					'x-discord-token': session.provider_token ?? ''
@@ -87,7 +86,7 @@
 				throw new Error('Could not load stats');
 			}
 			const payload = await response.json();
-			stats = payload.counts ?? { ban: 0, safe: 0, total: 0 };
+			stats = payload.counts ?? { exploiters: 0, safe: 0, total: 0 };
 		} catch (error) {
 			statsError = error instanceof Error ? error.message : 'Unknown error';
 		} finally {
@@ -126,7 +125,7 @@
 	onMount(async () => {
 		const { data } = await supabase.auth.getSession();
 		session = data.session;
-		const guildId = $page.params.guildId;
+		const guildId = $page.params.guildId!;
 		if (session) {
 			await loadConfig(guildId);
 			await loadStats(guildId);
@@ -222,18 +221,8 @@
 					<div class="flex items-center justify-between gap-4 flex-wrap">
 						<div>
 							<h2 class="display text-2xl">Statics overview</h2>
-							<p class="muted text-sm">Exploiter joined in the past {range}.</p>
+							<p class="muted text-sm">Latest exploiter activity totals.</p>
 						</div>
-						<select
-							class="rounded-full border border-white/20 bg-white/5 px-4 py-2 text-sm"
-							bind:value={range}
-							on:change={() => loadStats($page.params.guildId)}
-						>
-							<option value="1h">Past 1 hour</option>
-							<option value="24h">Past 24 hours</option>
-							<option value="7d">Past 7 days</option>
-							<option value="30d">Past 30 days</option>
-						</select>
 					</div>
 					{#if statsLoading}
 						<div class="surface rounded-[var(--radius-md)] p-6 flex items-center gap-3">
@@ -249,8 +238,8 @@
 						<div class="grid gap-4 md:grid-cols-3 stagger">
 							<div class="surface-alt rounded-[var(--radius-md)] p-5 flex flex-col gap-2 hover-lift">
 								<span class="pill border-black/10 text-[color:var(--text-dark)]">Flagged</span>
-								<h3 class="display text-2xl text-[color:var(--text-dark)]">{stats.ban}</h3>
-								<p class="text-sm text-[color:var(--text-dark)]/80">Exploiters flagged in range.</p>
+								<h3 class="display text-2xl text-[color:var(--text-dark)]">{stats.exploiters}</h3>
+								<p class="text-sm text-[color:var(--text-dark)]/80">Exploiters flagged.</p>
 							</div>
 							<div class="surface-alt rounded-[var(--radius-md)] p-5 flex flex-col gap-2 hover-lift">
 								<span class="pill border-black/10 text-[color:var(--text-dark)]">Safe</span>
@@ -276,12 +265,12 @@
 								class="rounded-full border border-white/20 bg-white/5 px-4 py-2"
 								bind:value={newWhitelistEntry}
 							/>
-							<button
-								class="btn-primary"
-								type="button"
-								on:click={() => addWhitelist($page.params.guildId)}
-								disabled={updating}
-							>
+					<button
+						class="btn-primary"
+						type="button"
+						on:click={() => addWhitelist($page.params.guildId!)}
+						disabled={updating}
+					>
 								Add whitelist
 							</button>
 						</div>
@@ -295,12 +284,12 @@
 									<span class="text-[color:var(--text-dark)]">{entry}</span>
 									<div class="flex items-center gap-3">
 										<span class="pill border-black/10 text-[color:var(--text-dark)]">Approved</span>
-										<button
-											class="btn-ghost border-black/20 text-[color:var(--text-dark)]"
-											type="button"
-											on:click={() => removeWhitelist($page.params.guildId, entry)}
-											disabled={updating}
-										>
+							<button
+								class="btn-ghost border-black/20 text-[color:var(--text-dark)]"
+								type="button"
+								on:click={() => removeWhitelist($page.params.guildId!, entry)}
+								disabled={updating}
+							>
 											Remove
 										</button>
 									</div>
