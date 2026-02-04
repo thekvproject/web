@@ -248,9 +248,9 @@
 					{:else}
 						<div class="grid gap-4 md:grid-cols-3 stagger">
 							<div class="surface-alt rounded-[var(--radius-md)] p-5 flex flex-col gap-2 hover-lift">
-								<span class="pill border-black/10 text-[color:var(--text-dark)]">Bans</span>
+								<span class="pill border-black/10 text-[color:var(--text-dark)]">Flagged</span>
 								<h3 class="display text-2xl text-[color:var(--text-dark)]">{stats.ban}</h3>
-								<p class="text-sm text-[color:var(--text-dark)]/80">Exploiters banned in range.</p>
+								<p class="text-sm text-[color:var(--text-dark)]/80">Exploiters flagged in range.</p>
 							</div>
 							<div class="surface-alt rounded-[var(--radius-md)] p-5 flex flex-col gap-2 hover-lift">
 								<span class="pill border-black/10 text-[color:var(--text-dark)]">Safe</span>
