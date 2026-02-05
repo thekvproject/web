@@ -5,7 +5,7 @@
 	import { PUBLIC_DISCORD_BOT_INVITE_URL } from '$env/static/public';
 
 	let session: Awaited<ReturnType<typeof supabase.auth.getSession>>['data']['session'] = null;
-	let activeTab: 'stats' | 'whitelist' = 'stats';
+	let activeTab: 'stats' | 'whitelist' | 'watchlist' = 'stats';
 	let config: {
 		approved: boolean;
 		server_invite: string | null;
@@ -18,6 +18,132 @@
 	let stats = { exploiters: 0, safe: 0, total: 0 };
 	let statsLoading = false;
 	let statsError = '';
+	const watchlist = [
+		{
+			userId: '1410511669125189705',
+			userTag: 'flower.head',
+			guildNames: [
+				'Codex Collective',
+				'FluxusZ',
+				'Ronix Studios Premium',
+				'wearedevs.net',
+				'Drift',
+				'Plexystrap',
+				'Water',
+				'Davestrap',
+				'Delta Executor',
+				'solara',
+				'LOWHUB',
+				'AK Admin',
+				'Lil baby fan club/Celex External',
+				'Raptor Development LLC',
+				'Seliware',
+				'Kron Hub',
+				'Rivet',
+				'Ronix Studios Support',
+				'Velostrap',
+				'Xeno',
+				'Ronix Studio',
+				'gold',
+				'Lumin Hub'
+			]
+		},
+		{
+			userId: '1407337385334800398',
+			userTag: 'dimrevived',
+			guildNames: ['Davestrap', 'Velostrap']
+		},
+		{
+			userId: '1390517384564965463',
+			userTag: '.runds',
+			guildNames: ['Xeno']
+		},
+		{
+			userId: '1339579865439010859',
+			userTag: 'sinkwater0812',
+			guildNames: ['Xeno']
+		},
+		{
+			userId: '1317516380500922499',
+			userTag: 'chips.r',
+			guildNames: ['Plexystrap', 'Velostrap', 'Davestrap']
+		},
+		{
+			userId: '1283057038351663166',
+			userTag: 'lejlizzle_',
+			guildNames: ['Xeno']
+		},
+		{
+			userId: '1178436254770151514',
+			userTag: 'john_sg0',
+			guildNames: ['Xeno']
+		},
+		{
+			userId: '1166005624195268709',
+			userTag: 'yagixisbetter',
+			guildNames: ['Davestrap']
+		},
+		{
+			userId: '1160247885967929364',
+			userTag: 'legacy.launcher',
+			guildNames: ['solara']
+		},
+		{
+			userId: '1153309671151652895',
+			userTag: 'flvneur',
+			guildNames: ['Xeno']
+		},
+		{
+			userId: '1016826041102245888',
+			userTag: 'asillyindividual1',
+			guildNames: ['Water']
+		},
+		{
+			userId: '999142457667227679',
+			userTag: 'polover1682',
+			guildNames: ['Davestrap']
+		},
+		{
+			userId: '989559396805787668',
+			userTag: 'prost5frost',
+			guildNames: ['Xeno']
+		},
+		{
+			userId: '954251297882767402',
+			userTag: 'qtsuriii',
+			guildNames: ['Xeno']
+		},
+		{
+			userId: '946270807909359686',
+			userTag: '_imovo_',
+			guildNames: ['Xeno']
+		},
+		{
+			userId: '917649642794147871',
+			userTag: 'danscape',
+			guildNames: ['Velostrap']
+		},
+		{
+			userId: '752618127031926867',
+			userTag: 'seblikeshandrolls',
+			guildNames: ['Xeno']
+		},
+		{
+			userId: '749015718216859698',
+			userTag: 'scubdub2049',
+			guildNames: ['Water']
+		},
+		{
+			userId: '726548293739348118',
+			userTag: 'davi123211',
+			guildNames: ['solara']
+		},
+		{
+			userId: '338450855399391232',
+			userTag: 'polarzer0',
+			guildNames: ['Velostrap']
+		}
+	];
 
 	const loadConfig = async (guildId: string) => {
 		if (!session) return;
@@ -201,20 +327,33 @@
 					<p class="font-semibold">Statics overview</p>
 					<p class="muted text-xs">Range + activity</p>
 				</button>
-				<button
-					type="button"
-					on:click={() => (activeTab = 'whitelist')}
-					class={`text-left rounded-[var(--radius-sm)] px-4 py-3 border-l-4 transition-colors ${
-						activeTab === 'whitelist'
-							? 'border-white bg-white/10'
-							: 'border-transparent bg-white/0 hover:bg-white/5'
-					}`}
-					aria-current={activeTab === 'whitelist' ? 'page' : undefined}
-				>
-					<p class="font-semibold">Whitelist</p>
-					<p class="muted text-xs">Allow list controls</p>
-				</button>
-			</aside>
+			<button
+				type="button"
+				on:click={() => (activeTab = 'whitelist')}
+				class={`text-left rounded-[var(--radius-sm)] px-4 py-3 border-l-4 transition-colors ${
+					activeTab === 'whitelist'
+						? 'border-white bg-white/10'
+						: 'border-transparent bg-white/0 hover:bg-white/5'
+				}`}
+				aria-current={activeTab === 'whitelist' ? 'page' : undefined}
+			>
+				<p class="font-semibold">Whitelist</p>
+				<p class="muted text-xs">Allow list controls</p>
+			</button>
+			<button
+				type="button"
+				on:click={() => (activeTab = 'watchlist')}
+				class={`text-left rounded-[var(--radius-sm)] px-4 py-3 border-l-4 transition-colors ${
+					activeTab === 'watchlist'
+						? 'border-white bg-white/10'
+						: 'border-transparent bg-white/0 hover:bg-white/5'
+				}`}
+				aria-current={activeTab === 'watchlist' ? 'page' : undefined}
+			>
+				<p class="font-semibold">Watchlist</p>
+				<p class="muted text-xs">Flagged actors</p>
+			</button>
+		</aside>
 
 			<div class="surface rounded-[var(--radius-md)] p-6 flex flex-col gap-6">
 				{#if activeTab === 'stats'}
@@ -253,7 +392,7 @@
 							</div>
 						</div>
 					{/if}
-				{:else}
+				{:else if activeTab === 'whitelist'}
 					<div class="flex items-center justify-between gap-4 flex-wrap">
 						<div>
 							<h2 class="display text-2xl">Whitelist</h2>
@@ -296,6 +435,49 @@
 								</div>
 							{/each}
 						{/if}
+					</div>
+				{:else}
+					<div class="flex items-center justify-between gap-4 flex-wrap">
+						<div>
+							<h2 class="display text-2xl">Guild watchlist</h2>
+							<p class="muted text-sm">Flagged user accounts sourced from guild_config.</p>
+						</div>
+						<span class="pill border-white/20 text-sm">
+							{watchlist.length} {watchlist.length === 1 ? 'entry' : 'entries'}
+						</span>
+					</div>
+					<div class="overflow-x-auto rounded-[var(--radius-md)] border border-white/10">
+						<table class="w-full text-sm">
+							<thead class="bg-white/5 text-left uppercase text-xs tracking-wide">
+								<tr>
+									<th class="px-4 py-3 font-semibold">User</th>
+									<th class="px-4 py-3 font-semibold">User ID</th>
+									<th class="px-4 py-3 font-semibold">Guilds</th>
+								</tr>
+							</thead>
+							<tbody>
+								{#each watchlist as entry, idx}
+									<tr class={idx % 2 === 0 ? 'bg-white/0' : 'bg-white/[0.02]'}>
+										<td class="px-4 py-4">
+											<div class="flex flex-col">
+												<span class="font-semibold">{entry.userTag}</span>
+												<span class="muted text-xs">Flagged account</span>
+											</div>
+										</td>
+										<td class="px-4 py-4">
+											<code class="text-xs bg-white/10 px-2 py-1 rounded">{entry.userId}</code>
+										</td>
+										<td class="px-4 py-4">
+											<div class="flex flex-wrap gap-2">
+												{#each entry.guildNames as guild}
+													<span class="pill border-white/15">{guild}</span>
+												{/each}
+											</div>
+										</td>
+									</tr>
+								{/each}
+							</tbody>
+						</table>
 					</div>
 				{/if}
 			</div>
